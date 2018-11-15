@@ -127,12 +127,22 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
     private CountyAdapter countyAdapter;
     private StreetAdapter streetAdapter;
 
+    /**
+     * 网络请求帮助类
+     */
     private NetWorkManager netWorkManager;
+    /**
+     * 网络请求地址
+     */
+    private String address_url;
 
     /**
      * 地址选择后接口
      */
     private OnAddressPickerListener listener;
+    /**
+     * 关闭diglog接口
+     */
     private OnDialogCloseListener dialogCloseListener;
 
     private Handler handler = new Handler(new Handler.Callback() {
@@ -199,14 +209,21 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
         }
     });
 
-
-    public AddressPicker(Context context) {
+    /**
+     * 初始化构造方法
+     * @author: whb
+     * @date: 2018/11/15 10:36
+     * @param url 获取地址数据的url
+     * @param initId 获取省级数据初始值
+     **/
+    public AddressPicker(Context context,String url,long initId) {
         this.context = context;
+        this.address_url = url;
         inflater = LayoutInflater.from(context);
         netWorkManager = new NetWorkManager(context);
         initView();
         initAdapter();
-        getProvinceList();
+        getProvinceList(initId);
     }
 
     /**
@@ -242,7 +259,7 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
         this.tv_county.setOnClickListener(new OnCountyTabClickListener());
         //街道事件监听
         this.tv_street.setOnClickListener(new OnStreetTabClickListener());
-        this.iv_close.setOnClickListener(new onCloseClickListener());
+        this.iv_close.setOnClickListener(new OnCloseClickListener());
 
         refreshIndicator();
     }
@@ -424,7 +441,7 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
                 tv_county.setText("请选择");
                 tv_street.setText("请选择");
                 //根据省份的id,从数据库中查询城市列表
-                getProvinceList();
+                getCityList(province.getId());
 
                 // 清空子级数据
                 list_city = null;
@@ -449,9 +466,9 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
      * @author: whb
      * @date: 2018/11/14 14:26
      **/
-    private void getProvinceList() {
+    private void getProvinceList(long id) {
         progressBar.setVisibility(View.VISIBLE);
-        netWorkManager.getRegionData(-1,PROVINCE_FLAG ,new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
+        netWorkManager.getRegionData(address_url + id,PROVINCE_FLAG ,new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
             @Override
             public void onSuccess(List<Entity> list) {
                 handler.sendMessage(Message.obtain(handler, PROVINCE_FLAG, list));
@@ -468,10 +485,11 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
      * 网络请求获取城市列表
      * @author: whb
      * @date: 2018/11/14 19:26
+     * @param id 父级id
      **/
     private void getCityList(long id) {
         progressBar.setVisibility(View.VISIBLE);
-        netWorkManager.getRegionData(id, CITY_FLAG, new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
+        netWorkManager.getRegionData(address_url + id, CITY_FLAG, new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
             @Override
             public void onSuccess(List<Entity> list) {
                 handler.sendMessage(Message.obtain(handler, CITY_FLAG, list));
@@ -488,10 +506,11 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
      * 网络请求获取城市列表
      * @author: whb
      * @date: 2018/11/14 19:26
+     * @param id 父级id
      **/
     private void getCountyList(long id) {
         progressBar.setVisibility(View.VISIBLE);
-        netWorkManager.getRegionData(id, COUNTY_FLAG, new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
+        netWorkManager.getRegionData(address_url + id, COUNTY_FLAG, new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
             @Override
             public void onSuccess(List<Entity> list) {
                 handler.sendMessage(Message.obtain(handler, COUNTY_FLAG, list));
@@ -508,10 +527,11 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
      * 网络请求获取城市列表
      * @author: whb
      * @date: 2018/11/14 19:26
+     * @param id 父级id
      **/
     private void getStreetList(long id) {
         progressBar.setVisibility(View.VISIBLE);
-        netWorkManager.getRegionData(id, STREET_FLAG, new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
+        netWorkManager.getRegionData(address_url + id, STREET_FLAG, new NetWorkManager.OnNetworkAccessToListListener<Entity>() {
             @Override
             public void onSuccess(List<Entity> list) {
                 handler.sendMessage(Message.obtain(handler, STREET_FLAG, list));
@@ -651,14 +671,14 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
     /**
      *设置字体选中的颜色
      */
-    public void setTextSelectedColor(int pickedColor){
+    public void setTextPickedColor(int pickedColor){
         this.pickedColor = pickedColor;
     }
 
     /**
      *设置字体没有选中的颜色
      */
-    public void setTextUnSelectedColor(int unPickedColor){
+    public void setTextUnPickedColor(int unPickedColor){
         this.unPickedColor = unPickedColor;
     }
     /**
@@ -932,7 +952,7 @@ public class AddressPicker implements AdapterView.OnItemClickListener {
     /**
      * 点击右边关闭dialog监听
      */
-    class onCloseClickListener implements View.OnClickListener{
+    class OnCloseClickListener implements View.OnClickListener{
 
         @Override
         public void onClick(View view) {

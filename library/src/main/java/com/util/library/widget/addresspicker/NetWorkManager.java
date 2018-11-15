@@ -47,10 +47,13 @@ public class NetWorkManager {
     private Gson gson;
     private Context context;
 
-    private String url = "http://www.365aq.cn/api/public/region/tree?parentid=";
-
     RequestQueue queue;
 
+    /**
+     * 进行网路请求的操作
+     * @author: whb
+     * @date: 2018/11/15 10:41
+     **/
     public NetWorkManager(Context context) {
         this.context = context;
         queue = Volley.newRequestQueue(context);
@@ -62,12 +65,10 @@ public class NetWorkManager {
      * @author: whb
      * @date: 2018/11/14 14:59
      **/
-    public void getRegionData(long id, final int flag, final OnNetworkAccessToListListener<Entity> listener) {
-        url = url + id;
+    public void getRegionData(String url,final int flag, final OnNetworkAccessToListListener<Entity> listener) {
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                url = "http://www.365aq.cn/api/public/region/tree?parentid=";
                 List<Entity> list = null;
                 if (PROVINCE_FLAG == flag) {
                     list = gson.fromJson(response.toString(), new TypeToken<List<Province>>() {

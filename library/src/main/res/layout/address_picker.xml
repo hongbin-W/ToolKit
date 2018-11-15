@@ -61,7 +61,7 @@
             android:layout_width="0dp"
             android:layout_height="2dp"
             android:layout_below="@+id/ll_tab"
-            android:background="@android:color/holo_red_dark" />
+            android:background="@color/holo_red_dark" />
 
     </RelativeLayout>
 
