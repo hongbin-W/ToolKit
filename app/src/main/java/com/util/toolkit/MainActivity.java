@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         if (dialog != null) {
             dialog.dismiss();
         }
-//        getSelectedArea();
     }
 
     @Override
